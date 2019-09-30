@@ -1,0 +1,33 @@
+{
+  "name": "typevert",
+  "version": "0.9.0",
+  "description": "Define Object to Object mapping using Typescript decorators",
+  "main": "lib/typevert.js",
+  "scripts": {
+    "build": "npm run clean && npx tsc -p tsconfig.build.json --declaration",
+    "clean": "rm -rf lib && rm .tsbuildinfo"
+  },
+  "types": "./lib/typevert.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andbul/typevert.git"
+  },
+  "keywords": [
+    "objecttoobject",
+    "mappers",
+    "decorators",
+    "typescript",
+    "mapstruct",
+    "js"
+  ],
+  "author": "Andrey Bulgakov <andbul0103@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andbul/typevert/issues"
+  },
+  "homepage": "https://github.com/andbul/typevert#readme",
+  "devDependencies": {
+    "@types/node": "^12.7.8",
+    "typescript": "^3.6.3"
+  }
+}
