@@ -4,7 +4,7 @@
     "description": "Define Object to Object mapping using Typescript decorators",
     "main": "lib/typevert.js",
     "scripts": {
-        "clean": "rm -rf lib && rm .tsbuildinfo",
+        "clean": "rm -rf lib",
         "build": "npm run clean && npm run build:tsc && npm run build:readme",
         "build:tsc": "npx tsc -p tsconfig.build.json --declaration",
         "build:readme": "cp README.md ./lib",
