@@ -68,7 +68,7 @@ function getOrderedConversion(expr: (x: any) => any, converterConstructor: Const
     } else if (converterConstructor && !expr) {
         const converter = new converterConstructor();
         return s => converter.convert(s);
-    } else if (!Converter && expr) {
+    } else if (!converterConstructor && expr) {
         return s => expr(s);
     } else {
         return s => s;
