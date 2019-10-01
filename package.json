@@ -9,6 +9,7 @@
         "build:tsc": "npx tsc -p tsconfig.build.json --declaration",
         "build:readme": "cp README.md ./lib",
         "test": "mocha -r ts-node/register -p tsconfig.test.json ./test/*.spec.ts",
+        "test:ci": "npm run test && npm run coverage",
         "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
         "release": "standard-version",
         "release:patch": "npm run release -- --release-as patch",
