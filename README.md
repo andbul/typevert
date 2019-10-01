@@ -1,5 +1,7 @@
 # Typevert
 
+[![Build Status](https://travis-ci.org/andbul/typevert.svg?branch=master)](https://travis-ci.org/andbul/typevert)
+
 Define Object to Object mapping using Typescript decorators
 
 ## Basic usage
