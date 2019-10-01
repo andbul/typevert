@@ -25,7 +25,7 @@ export class MappingRules {
     target!: string;
     default?: any;
     expr?: (x: any) => any;
-    isCollection?: Boolean = false;
+    isCollection?: Boolean;
     converter?: Constructor<Converter<any, any>>;
     // converter?: Converter<any, any>
 }

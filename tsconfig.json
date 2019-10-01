@@ -11,12 +11,11 @@
     },
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowJs": false,
     "inlineSourceMap": true,
     "incremental": true,
     "tsBuildInfoFile": "./.tsbuildinfo",
     "newLine": "LF",
     "removeComments": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "test/**/*"]
 }
