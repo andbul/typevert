@@ -1,5 +1,5 @@
-import {Constructor, Conversion, Converter} from "./converter";
-import {generateMappingFunction} from "./mapping"
+import { Constructor, Conversion, Converter } from "./converter";
+import { generateMappingFunction } from "./mapping";
 
 /**
  * Mapping rules that will be used during mapping.
@@ -21,12 +21,12 @@ import {generateMappingFunction} from "./mapping"
  *  - Evaluate converter
  */
 export class MappingRules {
-    source!: string;
-    target!: string;
-    default?: any;
-    expr?: (x: any) => any;
-    isCollection?: Boolean;
-    converter?: Constructor<Converter<any, any>>;
+    public source!: string;
+    public target!: string;
+    public default?: any;
+    public expr?: (x: any) => any;
+    public isCollection?: boolean;
+    public converter?: Constructor<Converter<any, any>>;
     // converter?: Converter<any, any>
 }
 
@@ -51,14 +51,17 @@ export interface MapperDeclaration<IN, OUT> {
  * @constructor - generated mapper
  */
 export function Mapper<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>, mappings?: MappingRules[]) {
-    return function <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) {
+    return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
         return class extends constructor {
-            mappings = mappings;
-            mappingFunction = generateMappingFunction(mapperDeclaration.sourceType, mapperDeclaration.targetType, mappings)
-        }
-    }
+            public mappings = mappings;
+            public mappingFunction = generateMappingFunction(
+                mapperDeclaration.sourceType,
+                mapperDeclaration.targetType,
+                mappings
+            );
+        };
+    };
 }
-
 
 /**
  * Mapper API with separate mapper declaration and mappings decorators
@@ -66,12 +69,12 @@ export function Mapper<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>, m
  * @constructor
  */
 export function Mapper2<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>) {
-    return function <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) {
+    return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
         return class extends constructor {
-            sourceType = mapperDeclaration.sourceType;
-            targetType = mapperDeclaration.targetType;
-        }
-    }
+            public sourceType = mapperDeclaration.sourceType;
+            public targetType = mapperDeclaration.targetType;
+        };
+    };
 }
 
 /**
@@ -80,11 +83,15 @@ export function Mapper2<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>) 
  * @constructor
  */
 export function Mapping<IN, OUT>(mappings?: MappingRules[]) {
-    return function <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) {
+    return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
         const currentConstructor = constructor;
         return class extends constructor {
-            mappings = mappings;
-            mappingFunction = generateMappingFunction(currentConstructor['sourceType'], currentConstructor['targetType'], mappings)
-        }
-    }
+            public mappings = mappings;
+            public mappingFunction = generateMappingFunction(
+                currentConstructor["sourceType"],
+                currentConstructor["targetType"],
+                mappings
+            );
+        };
+    };
 }

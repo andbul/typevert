@@ -1,0 +1,66 @@
+{
+    "defaultSeverity": "error",
+    "extends": ["tslint:recommended", "tslint-config-prettier"],
+    "linterOptions": {
+        "exclude": ["bin", "lib", "test", "*.test.ts"]
+    },
+    "rulesDirectory": ["node_modules/tslint-eslint-rules/dist/rules"],
+    "rules": {
+        "quotemark": {
+            "severity": "warn",
+            "options": ["double"]
+        },
+        "indent": {
+            "severity": "error",
+            "options": ["spaces", 4]
+        },
+        "ter-indent": [true, 4],
+        "semicolon": [false, "always", "strict-bound-class-methods"],
+        "linebreak-style": [true, "LF"],
+        "max-line-length": [true, 120],
+        "comment-format": {
+            "options": ["check-space"],
+            "severity": "warn"
+        },
+        "whitespace": {
+            "options": [
+                "check-branch",
+                "check-operator",
+                "check-separator",
+                "check-preblock",
+                "check-branch",
+                "check-module"
+            ]
+        },
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-leading-underscore",
+            "require-const-for-all-caps",
+            "allow-pascal-case"
+        ],
+        "no-implicit-dependencies": [true, "dev"],
+        "member-access": [true, "check-accessor", "check-parameter-property"],
+        "no-unused-variable": {
+            "severity": "warn"
+        },
+        "no-unused-expression": {
+            "severity": "warn"
+        },
+        "encoding": true,
+        "no-invalid-template-strings": true,
+        "eofline": true,
+        "restrict-plus-operands": true,
+        "use-isnan": true,
+        "no-duplicate-imports": true,
+        "no-string-literal": false,
+        "prefer-method-signature": true,
+        "no-require-imports": true,
+        "max-classes-per-file": false,
+        "interface-name": false,
+        "object-literal-sort-keys": false,
+        "array-type": false,
+        "member-ordering": false
+    }
+}

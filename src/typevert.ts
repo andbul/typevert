@@ -1,9 +1,7 @@
-import {Mapper} from "./decorators";
-import {MappingRules} from "./decorators";
-import {Mapper2} from "./decorators";
-import {Mapping} from "./decorators";
-import {Converter} from "./converter";
+import { Mapper, Mapper2, Mapping, MappingRules } from "./decorators";
 
-export {Mapper, Converter}
-export {MappingRules}
-export {Mapper2, Mapping}
+import { Converter } from "./converter";
+
+export { Mapper, Converter };
+export { MappingRules };
+export { Mapper2, Mapping };
