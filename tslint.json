@@ -55,7 +55,6 @@
         "use-isnan": true,
         "no-duplicate-imports": true,
         "no-string-literal": false,
-        "prefer-method-signature": true,
         "no-require-imports": true,
         "max-classes-per-file": false,
         "interface-name": false,
