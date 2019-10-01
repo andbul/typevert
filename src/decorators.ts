@@ -20,13 +20,13 @@ import { generateMappingFunction } from "./mapping";
  *  - Evaluate expr
  *  - Evaluate converter
  */
-export class MappingRules {
-    public source!: string;
-    public target!: string;
-    public default?: any;
-    public expr?: (x: any) => any;
-    public isCollection?: boolean;
-    public converter?: Constructor<Converter<any, any>>;
+export interface MappingRules {
+    source: string;
+    target: string;
+    default?: any;
+    expr?: (x: any) => any;
+    isCollection?: boolean;
+    converter?: Constructor<Converter<any, any>>;
     // converter?: Converter<any, any>
 }
 
