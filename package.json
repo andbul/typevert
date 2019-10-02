@@ -1,6 +1,6 @@
 {
     "name": "typevert",
-    "version": "0.9.5",
+    "version": "0.9.6",
     "description": "Define Object to Object mapping using Typescript decorators",
     "main": "lib/typevert.js",
     "scripts": {
