@@ -4,20 +4,14 @@
     "description": "Define Object to Object mapping using Typescript decorators",
     "main": "lib/typevert.js",
     "scripts": {
-        "clean": "rm -rf lib",
-        "build": "npm run clean && npm run build:tsc",
-        "build:tsc": "npx tsc -p tsconfig.build.json --declaration",
-        "build:readme": "cp README.md ./lib",
-        "test": "mocha -r ts-node/register -p tsconfig.test.json ./test/*.spec.ts",
-        "test:ci": "npm run test && npm run coverage",
-        "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
+        "clean": "rm -rf ./lib && rm -f ./.tsbuildinfo && rm -rf ./.nyc_output && rm -rf ./coverage",
+        "build": "npm run build:tsc",
+        "build:tsc": "tsc -p tsconfig.build.json --declaration",
+        "lint": "tslint --project tsconfig.json {src}/**/*.ts",
+        "test": "mocha -r ts-node/register -p tsconfig.test.json ./test/*.spec.ts ",
+        "coverage": "nyc --reporter=lcov npm run test",
         "release": "standard-version",
-        "release:patch": "npm run release -- --release-as patch",
-        "release:minor": "npm run release -- --release-as minor",
-        "release:major": "npm run release -- --release-as major",
-        "publish": "npm publish",
-        "typecheck": "tsc --noEmit --skipLibCheck",
-        "lint": "tslint --project tsconfig.json"
+        "typecheck": "tsc --noEmit --skipLibCheck"
     },
     "husky": {
         "hooks": {
@@ -66,5 +60,8 @@
         "tslint-config-prettier": "^1.18.0",
         "tslint-eslint-rules": "^5.4.0",
         "typescript": "^3.6.3"
+    },
+    "dependencies": {
+        "coveralls": "^3.0.6"
     }
 }

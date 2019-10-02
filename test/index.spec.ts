@@ -1,7 +1,7 @@
 /* tslint:disable */
 import { suit as PrimitiveSuit } from "./suits/primitives.test";
 import { suit as CollectionSuit } from "./suits/collection.test";
-import { suit as OrderSuit } from "./suits/mappingorder.test";
+import { suit as OrderSuit } from "./suits/ordering.test";
 import { expect } from "chai";
 import { describe, should } from "mocha";
 
