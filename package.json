@@ -9,7 +9,7 @@
         "lint": "tslint --project tsconfig.json {src}/**/*.ts",
         "build": "tsc -p tsconfig.build.json --declaration",
         "test": "mocha -r ts-node/register -p tsconfig.test.json ./test/*.spec.ts",
-        "coverage": "NODE_ENV=test nyc --reporter=lcov npm run test",
+        "coverage": "NODE_ENV=test nyc npm run test",
         "coveralls": "cat ./coverage/lcov.info | coveralls",
         "release": "standard-version"
     },
