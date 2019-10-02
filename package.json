@@ -1,11 +1,11 @@
 {
     "name": "typevert",
-    "version": "0.9.1",
+    "version": "0.9.2",
     "description": "Define Object to Object mapping using Typescript decorators",
     "main": "lib/typevert.js",
     "scripts": {
         "clean": "rm -rf lib",
-        "build": "npm run clean && npm run build:tsc && npm run build:readme",
+        "build": "npm run clean && npm run build:tsc",
         "build:tsc": "npx tsc -p tsconfig.build.json --declaration",
         "build:readme": "cp README.md ./lib",
         "test": "mocha -r ts-node/register -p tsconfig.test.json ./test/*.spec.ts",
@@ -15,7 +15,7 @@
         "release:patch": "npm run release -- --release-as patch",
         "release:minor": "npm run release -- --release-as minor",
         "release:major": "npm run release -- --release-as major",
-        "publish": "npm run build && npm publish ./lib",
+        "publish": "npm run build && npm publish",
         "typecheck": "tsc --noEmit --skipLibCheck",
         "lint": "tslint --project tsconfig.json"
     },
