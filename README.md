@@ -1,17 +1,18 @@
 # Typevert
 
 [![Build Status](https://travis-ci.org/andbul/typevert.svg?branch=master)](https://travis-ci.org/andbul/typevert)
+[![Coverage Status](https://coveralls.io/repos/github/andbul/typevert/badge.svg?branch=master)](https://coveralls.io/github/andbul/typevert?branch=master)
 
 Define Object to Object mapping using Typescript decorators
 
 ## Basic usage
 
 ```typescript
-import {Mapper, Converter} from "./typevert";
+import { Mapper, Converter } from "./typevert";
 
 class A {
     aField: string = "common_field";
-    aCollection: Number[] = [1,2,3,4];
+    aCollection: Number[] = [1, 2, 3, 4];
 }
 
 class B {
@@ -19,26 +20,27 @@ class B {
     bCollection: Number[];
 }
 
-@Mapper({sourceType: A, targetType: B}, [
-    {source: "aField", target: "bField"},
-    {source: "aCollection", target: "bCollection", isCollection: true},
+@Mapper({ sourceType: A, targetType: B }, [
+    { source: "aField", target: "bField" },
+    { source: "aCollection", target: "bCollection", isCollection: true },
 ])
 class AToBMapper extends Converter<A, B> {}
 
 const a = new A();
 const aToBConverter = new AToBMapper();
 const resultB = aToBConverter.convert(a);
-
 ```
 
 ## Motivation
 
-A common problem when converting classes one to another is that you have to write a lot of boilerplate mapping functions or converters.
-For example mapping Mongo Entities to your internal objects could produce a significant number of nested mappings, null checks, etc.
+A common problem when converting classes one to another is that you have to write a lot of boilerplate mapping functions
+or converters. For example mapping Mongo Entities to your internal objects could produce a significant number of nested
+mappings, null checks, etc.
 
 Typevert aims to solve this problem.
 
 Instead of:
+
 ```typescript
 class DocumentEntity {
     name: string;
@@ -64,19 +66,19 @@ class User {
 }
 
 function mapUserEntityToUser(userEntity: UserEntity) {
-    if (userEntity == null){
-        return null
+    if (userEntity == null) {
+        return null;
     }
     const user = new User();
     user.id = userEntity.id;
     user.roles = userEntity.roles == null ? null : userEntity.roles.map(role => role.toUpperCase());
-    user.documents = user.documents == null ? null : userEntity.documents.map(doc => mapDocuments(doc))
+    user.documents = user.documents == null ? null : userEntity.documents.map(doc => mapDocuments(doc));
     return user;
 }
 
 function mapDocuments(documentEntity: DocumentEntity) {
-    if (documentEntity == null){
-        return null
+    if (documentEntity == null) {
+        return null;
     }
     const document = new Document();
     document.name = documentEntity.name;
@@ -89,26 +91,26 @@ function mapDocuments(documentEntity: DocumentEntity) {
 You can just write:
 
 ```typescript
-@Mapper({sourceType: DocumentEntity, targetType: Document},[
-    {source: "name", target: "name"},
-    {source: "format", target: "name", expr: name => name.split(".")[1]},
-    {source: "payload", target: "payload"}
+@Mapper({ sourceType: DocumentEntity, targetType: Document }, [
+    { source: "name", target: "name" },
+    { source: "format", target: "name", expr: name => name.split(".")[1] },
+    { source: "payload", target: "payload" },
 ])
 class DocumentMapper extends Converter<DocumentEntity, Document> {}
 
-@Mapper({sourceType: DocumentEntity, targetType: Document},[
-    {source: "id", target: "id"},
-    {source: "roles", target: "roles", isCollection: true, expr: role => role.toUpperCase()},
-    {source: "documents", target: "documents", isCollection: true, converter: DocumentMapper}
+@Mapper({ sourceType: DocumentEntity, targetType: Document }, [
+    { source: "id", target: "id" },
+    { source: "roles", target: "roles", isCollection: true, expr: role => role.toUpperCase() },
+    { source: "documents", target: "documents", isCollection: true, converter: DocumentMapper },
 ])
 class UserMapper extends Converter<DocumentEntity, Document> {}
 ```
 
 ## Requirements
 
-* TypeScript 3.2+
-* Node 8+
-* `emitDecoratorMetadata` and `experimentalDecorators` must be enabled in `tsconfig.json`
+-   TypeScript 3.2+
+-   Node 8+
+-   `emitDecoratorMetadata` and `experimentalDecorators` must be enabled in `tsconfig.json`
 
 ## Install
 
@@ -118,13 +120,15 @@ class UserMapper extends Converter<DocumentEntity, Document> {}
 
 ### Mapper decorator
 
-The @Mapper decorator adds the target class the mappingFunction method. It admits converting your source object to target according to the mappings.
+The @Mapper decorator adds the target class the mappingFunction method. It admits converting your source object to
+target according to the mappings.
 
 Mapper decorator checks that your class is a child of the Converter<IN, OUT> abstract class.
 
 Decorator accepts two arguments:
-- MapperDeclaration - which contains mapper description: name, source type and target type
-    
+
+-   MapperDeclaration - which contains mapper description: name, source type and target type
+
     ```typescript
     export interface MapperDeclaration<IN, OUT> {
         name?: string; // Name of the mapper
@@ -133,7 +137,7 @@ Decorator accepts two arguments:
     }
     ```
 
-- Mappings - array of rules how to convert one field to another
+-   Mappings - array of rules how to convert one field to another
 
     ```typescript
     export class MappingRules {
@@ -141,18 +145,20 @@ Decorator accepts two arguments:
         target!: string; // Field name from the target object where to map
         default?: any; // Default value if source field is null
         expr?: (x: any) => any; // Expression for manual converting or preparing field
-        isCollection?: Boolean = false; // Flag that enables Array.map converting for this field 
+        isCollection?: Boolean = false; // Flag that enables Array.map converting for this field
         converter?: Constructor<Converter<any, any>>; // Converter constructor for nested objects
     }
     ```
-    
+
     Options in mapping rules have priority when evaluating:
-    1) Exec converting by `expr`
-    2) Exec converting by `converter.convert`
-    
+
+    1. Exec converting by `expr`
+    2. Exec converting by `converter.convert`
+
     If one of this options empty, another will be successfully performed.
-    
+
     Additionally:
-     * If source field is null then default value will be set and none `expr` or `converter` called
-     * If isCollection then for each object in collection mapping will be performed
-     * If none `expr` or `converter` is set and field value is not null then common assigment is performing
+
+    -   If source field is null then default value will be set and none `expr` or `converter` called
+    -   If isCollection then for each object in collection mapping will be performed
+    -   If none `expr` or `converter` is set and field value is not null then common assigment is performing
