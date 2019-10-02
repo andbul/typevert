@@ -5,13 +5,13 @@
     "main": "lib/typevert.js",
     "scripts": {
         "clean": "rm -rf ./lib && rm -f ./.tsbuildinfo && rm -rf ./.nyc_output && rm -rf ./coverage",
-        "build": "npm run build:tsc",
-        "build:tsc": "tsc -p tsconfig.build.json --declaration",
+        "typecheck": "tsc --noEmit --skipLibCheck",
         "lint": "tslint --project tsconfig.json {src}/**/*.ts",
-        "test": "mocha -r ts-node/register -p tsconfig.test.json ./test/*.spec.ts ",
-        "coverage": "nyc --reporter=lcov npm run test",
-        "release": "standard-version",
-        "typecheck": "tsc --noEmit --skipLibCheck"
+        "build": "tsc -p tsconfig.build.json --declaration",
+        "test": "NODE_ENV=test mocha -r ts-node/register -p tsconfig.test.json ./test/*.spec.ts ",
+        "coverage": "nyc report --reporter=lcov",
+        "coveralls": "cat coverage/lcov.info | coveralls",
+        "release": "standard-version"
     },
     "husky": {
         "hooks": {
