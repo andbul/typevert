@@ -1,6 +1,6 @@
 {
     "name": "typevert",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "description": "Define Object to Object mapping using Typescript decorators",
     "main": "lib/typevert.js",
     "scripts": {
@@ -15,7 +15,7 @@
         "release:patch": "npm run release -- --release-as patch",
         "release:minor": "npm run release -- --release-as minor",
         "release:major": "npm run release -- --release-as major",
-        "publish": "npm run build && npm publish",
+        "publish": "npm publish",
         "typecheck": "tsc --noEmit --skipLibCheck",
         "lint": "tslint --project tsconfig.json"
     },
