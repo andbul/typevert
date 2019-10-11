@@ -1,6 +1,6 @@
 /* tslint:disable */
 import { expect } from "chai";
-import { Converter, Mapper, MappingRules } from "../../src/typevert";
+import { Converter, Mapper, MappingRule } from "../../src/typevert";
 import { generateConverter } from "./testutils";
 
 export function suit() {

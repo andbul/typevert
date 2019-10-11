@@ -1,5 +1,5 @@
 import { Constructor, Converter } from "./converter";
-import { MappingRules } from "./decorators";
+import { MappingRule, ContainstConverter, MappingRuleWithConverter, MappingRuleWithExpression } from "./decorators";
 
 /**
  * Generates mapping function which will be called during runtime
@@ -8,13 +8,30 @@ import { MappingRules } from "./decorators";
  * @param mappings - mappings array
  * @param options - additional mapping options
  */
-export function generateMappingFunction<IN, OUT>(
+export function generateMappingFunction<
+    IN,
+    OUT,
+    SourceField extends keyof IN,
+    TargetField extends keyof OUT,
+    SourceFieldType extends IN[SourceField],
+    TargetFieldType extends OUT[TargetField]
+>(
     sourceType: Constructor<IN>,
     targetType: Constructor<OUT>,
-    mappings: MappingRules[],
+    mappings: MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType>[],
     options?: {}
 ) {
     return (sourceObject: IN) => mapObject(sourceObject, new targetType(), mappings);
+}
+
+// TODO Move to another file
+function getProperty<T, K extends keyof T>(obj: T, key: K) {
+    return obj[key]; // Inferred type is T[K]
+}
+
+// TODO Move to another file
+function setProperty<T, K extends keyof T>(obj: T, key: K, value: T[K]) {
+    obj[key] = value;
 }
 
 /**
@@ -24,10 +41,17 @@ export function generateMappingFunction<IN, OUT>(
  * @param mappings - from => to mapping declaration with meta information
  * @param enableNullCheck - enable null check when source object is null
  */
-export function mapObject<IN, OUT>(
+export function mapObject<
+    IN,
+    OUT,
+    SourceField extends keyof IN,
+    TargetField extends keyof OUT,
+    SourceFieldType extends IN[SourceField],
+    TargetFieldType extends OUT[TargetField]
+>(
     sourceObject: IN,
     targetObject: OUT,
-    mappings: MappingRules[],
+    mappings: MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType>[],
     enableNullCheck: boolean = true
 ) {
     if (enableNullCheck && sourceObject == null) {
@@ -39,16 +63,19 @@ export function mapObject<IN, OUT>(
         const targetField = mapping.target;
         const sourceField = mapping.source;
         const defaultValue = mapping.default;
-        const fieldValue = sourceObject[sourceField];
-        const convert = getOrderedConversion(mapping.expr, mapping.converter);
+        // TODO Typeguards or go js
+        const fieldValue = getProperty(sourceObject, sourceField) as SourceFieldType;
+        const convert = getOrderedConversion(mapping);
 
         // Map object//
         if (!fieldValue && defaultValue) {
-            targetObject[targetField] = defaultValue;
-        } else if (fieldValue && mapping.isCollection) {
-            targetObject[targetField] = convertCollection(fieldValue, convert);
+            setProperty(targetObject, targetField, defaultValue);
+        } else if (fieldValue && mapping.isCollection && fieldValue instanceof Array) {
+            // TODO Typeguards or go js
+            const converted = (convertCollection(fieldValue, convert) as unknown) as TargetFieldType;
+            setProperty(targetObject, targetField, converted);
         } else if (fieldValue) {
-            targetObject[targetField] = convert(fieldValue);
+            setProperty(targetObject, targetField, convert(fieldValue));
         }
     });
 
@@ -61,18 +88,19 @@ export function mapObject<IN, OUT>(
  * @param expr - expression that will be evaluated
  * @param Converter - converter constructor
  */
-function getOrderedConversion(expr: (x: any) => any, converterConstructor: Constructor<Converter<any, any>>) {
-    if (converterConstructor && expr) {
-        const converter = new converterConstructor();
-        return s => converter.convert(expr(s));
-    } else if (converterConstructor && !expr) {
-        const converter = new converterConstructor();
-        return s => converter.convert(s);
-    } else if (!converterConstructor && expr) {
-        return s => expr(s);
-    } else {
-        return s => s;
+function getOrderedConversion<SourceField, TargetField, SourceFieldType, TargetFieldType>(
+    rule: MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType>
+) {
+    if ("converter" in rule) {
+        const converter = new rule.converter();
+        return (s: SourceFieldType) => converter.convert(s);
     }
+
+    if ("expr" in rule) {
+        return (s: SourceFieldType) => rule.expr(s);
+    }
+
+    return (s: SourceFieldType) => (s as unknown) as TargetFieldType;
 }
 
 /**

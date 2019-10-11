@@ -1,6 +1,6 @@
-import { Mapper, MappingRules } from "./decorators";
+import { Mapper, MappingRule } from "./decorators";
 
 import { Converter } from "./converter";
 
 export { Mapper, Converter };
-export { MappingRules };
+export { MappingRule };
