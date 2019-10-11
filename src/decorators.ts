@@ -62,36 +62,3 @@ export function Mapper<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>, m
         };
     };
 }
-
-/**
- * Mapper API with separate mapper declaration and mappings decorators
- * @param mapperDeclaration - declaration
- * @constructor
- */
-export function Mapper2<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>) {
-    return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
-        return class extends constructor {
-            public sourceType = mapperDeclaration.sourceType;
-            public targetType = mapperDeclaration.targetType;
-        };
-    };
-}
-
-/**
- * Mapper API with separate mapper declaration and mappings decorators
- * @param mappings - mappings
- * @constructor
- */
-export function Mapping<IN, OUT>(mappings?: MappingRules[]) {
-    return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
-        const currentConstructor = constructor;
-        return class extends constructor {
-            public mappings = mappings;
-            public mappingFunction = generateMappingFunction(
-                currentConstructor["sourceType"],
-                currentConstructor["targetType"],
-                mappings
-            );
-        };
-    };
-}
