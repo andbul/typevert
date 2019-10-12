@@ -25,11 +25,11 @@ type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 
 export type ContainsExpression<SourceFieldType, TargetFieldType> = {
-    expr?: (x: SourceFieldType) => TargetFieldType;
+    expr: (x: SourceFieldType) => TargetFieldType;
 };
 
-export type ContainstConverter<SourceFieldType, TargetFieldType> = {
-    converter?: Constructor<Converter<SourceFieldType, TargetFieldType>>;
+export type ContainsConverter<SourceFieldType, TargetFieldType> = {
+    converter: Constructor<Converter<SourceFieldType, TargetFieldType>>;
 };
 
 export type Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> = {
@@ -39,40 +39,12 @@ export type Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> = {
     isCollection?: boolean;
 };
 
-export type MappingRuleWithExpression<SourceField, TargetField, SourceFieldType, TargetFieldType> = Rule<
-    SourceField,
-    TargetField,
-    SourceFieldType,
-    TargetFieldType
-> &
-    ContainsExpression<SourceFieldType, TargetFieldType>;
-
-export type MappingRuleWithConverter<SourceField, TargetField, SourceFieldType, TargetFieldType> = Rule<
-    SourceField,
-    TargetField,
-    SourceFieldType,
-    TargetFieldType
-> &
-    ContainstConverter<SourceFieldType, TargetFieldType>;
-
 export type MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType> = XOR<
-    MappingRuleWithExpression<SourceField, TargetField, SourceFieldType, TargetFieldType>,
-    MappingRuleWithConverter<SourceField, TargetField, SourceFieldType, TargetFieldType>
+    Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> &
+        Partial<ContainsConverter<SourceFieldType, TargetFieldType>>,
+    Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> &
+        Partial<ContainsExpression<SourceFieldType, TargetFieldType>>
 >;
-
-// TODO test guards and types
-function isMappingWithConverter<SourceField, TargetField, SourceFieldType, TargetFieldType>(
-    rule: MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType>
-): rule is MappingRuleWithConverter<SourceField, TargetField, SourceFieldType, TargetFieldType> {
-    return rule.converter !== undefined;
-}
-
-// TODO test guards and types
-function isMappingWithExpression<SourceField, TargetField, SourceFieldType, TargetFieldType>(
-    rule: MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType>
-): rule is MappingRuleWithExpression<SourceField, TargetField, SourceFieldType, TargetFieldType> {
-    return rule.expr !== undefined;
-}
 
 /**
  * Declaration that describes mapper with:

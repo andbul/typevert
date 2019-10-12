@@ -1,5 +1,5 @@
 import { Constructor, Converter } from "./converter";
-import { MappingRule, ContainstConverter, MappingRuleWithConverter, MappingRuleWithExpression } from "./decorators";
+import { MappingRule } from "./decorators";
 
 /**
  * Generates mapping function which will be called during runtime
