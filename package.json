@@ -2,7 +2,7 @@
     "name": "typevert",
     "version": "0.9.9",
     "description": "Define Object to Object mapping using Typescript decorators",
-    "main": "lib/typevert.js",
+    "main": "lib/index.js",
     "scripts": {
         "clean": "rm -rf ./lib && rm -f ./.tsbuildinfo && rm -rf ./.nyc_output && rm -rf ./coverage",
         "typecheck": "tsc --noEmit --skipLibCheck",
@@ -25,7 +25,7 @@
         ],
         "*.ts": "tslint --project tsconfig.json {src}/**/*.ts"
     },
-    "types": "./lib/typevert.d.ts",
+    "types": "./lib/index.d.ts",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/andbul/typevert.git"
