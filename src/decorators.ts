@@ -8,18 +8,16 @@ import { type } from "os";
  * source - name of the source object field
  * source - name of the target object field
  * default - set default value if field is null
- * expr - helps to pre evaluate field value
  * isCollection - transform field value with Array.map
+ * expr - helps to  convert value instead implementing converter
  * converter - convert field value with converter
  *
  * Mapping has the next order:
  *  - Setup default in field if null
- *  - Evaluate expr
- *  - Evaluate converter
+ *  - Evaluate expr or Evaluate converter
  *
  *  If isCollection is true then for each value in collection will be performed:
- *  - Evaluate expr
- *  - Evaluate converter
+ *  - Evaluate expr or Evaluate converter
  */
 type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;

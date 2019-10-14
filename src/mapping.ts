@@ -36,6 +36,7 @@ function setProperty<T, K extends keyof T>(obj: T, key: K, value: T[K]) {
 
 /**
  * Generated mapping function
+ *
  * @param sourceObject - object that contains values
  * @param targetObject - object that will be filled according mapping
  * @param mappings - from => to mapping declaration with meta information
@@ -84,7 +85,7 @@ export function mapObject<
 
 /**
  * Describes order of converting.
- * Current realisation is: expr => converter.convert
+ *
  * @param expr - expression that will be evaluated
  * @param Converter - converter constructor
  */

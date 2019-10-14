@@ -140,22 +140,20 @@ Decorator accepts two arguments:
 -   Mappings - array of rules how to convert one field to another
 
     ```typescript
-    export class MappingRules {
-        source!: string; // Field name from the source object which would be mapped
-        target!: string; // Field name from the target object where to map
-        default?: any; // Default value if source field is null
-        expr?: (x: any) => any; // Expression for manual converting or preparing field
+    export class MappingRules<SourceField, TargetField, SourceFieldType, TargetFieldType> {
+        source!: SourceField; // String Field name from the source object which would be mapped
+        target!: TargetField; // String Field name from the target object where to map
+        default?: TargetFieldType; // Default value if source field is null
         isCollection?: Boolean = false; // Flag that enables Array.map converting for this field
-        converter?: Constructor<Converter<any, any>>; // Converter constructor for nested objects
+        expr?: (x: SourceFieldType) => TargetFieldType; // Expression for manual converting or preparing field
+        converter?: Constructor<Converter<SourceFieldType, TargetFieldType>>; // Converter constructor for nested objects
     }
     ```
 
-    Options in mapping rules have priority when evaluating:
+    Options in mapping rules have choice when evaluating:
 
-    1. Exec converting by `expr`
+    1. Exec converting by `expr` OR
     2. Exec converting by `converter.convert`
-
-    If one of this options empty, another will be successfully performed.
 
     Additionally:
 
