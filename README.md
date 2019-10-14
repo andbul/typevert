@@ -150,9 +150,9 @@ Decorator accepts two arguments:
     }
     ```
 
-    Options in mapping rules have choice when evaluating:
+    Options in mapping rules have order when `expr` and `converter` are present :
 
-    1. Exec converting by `expr` OR
+    1. Exec converting by `expr`
     2. Exec converting by `converter.convert`
 
     Additionally:
