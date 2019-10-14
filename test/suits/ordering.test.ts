@@ -1,5 +1,5 @@
 /* tslint:disable */
-import { Mapper, Converter, MappingRules } from "../../src/typevert";
+import { Mapper, Converter, MappingRule } from "../../src/typevert";
 import { expect } from "chai";
 import { generateConverter, generateConverterConstructor } from "./testutils";
 
@@ -18,7 +18,7 @@ export function suit() {
             {
                 source: "a_field",
                 target: "b_field",
-                default: 123,
+                default: 1,
                 expr: (x: string) => {
                     throw new Error("Failed");
                 },
@@ -31,7 +31,7 @@ export function suit() {
         // Assert
         expect(result)
             .to.have.property("b_field")
-            .that.equals(123);
+            .that.equals(1);
     });
 
     it("should map field by expr", () => {
@@ -74,51 +74,10 @@ export function suit() {
 
         const a = new A();
         const internalConverter = generateConverterConstructor(C, ConvertedC, [
-            { source: "c_field", target: "c_internal_field", default: "DEFAULT_FIELD" },
+            { source: "c_field", target: "c_internal_field", default: 1 },
         ]);
         const converter = generateConverter(A, B, [
-            { source: "a_field", target: "b_field", default: "DEFAULT_FIELD", converter: internalConverter },
-        ]);
-
-        // Test
-        const result = converter.convert(new A());
-
-        // Assert
-        expect(result)
-            .to.have.property("b_field")
-            .that.is.instanceof(ConvertedC);
-        expect(result.b_field)
-            .to.have.property("c_internal_field")
-            .that.equals("expected");
-    });
-
-    it("should map field by expr then by converter", () => {
-        // Setup
-        class C {
-            c_field: string = "expected";
-        }
-        class ConvertedC {
-            c_internal_field: number;
-        }
-        class A {
-            a_field: string = "ignored";
-        }
-        class B {
-            b_field: ConvertedC;
-        }
-
-        const a = new A();
-        const internalConverter = generateConverterConstructor(C, ConvertedC, [
-            { source: "c_field", target: "c_internal_field", default: "DEFAULT_FIELD" },
-        ]);
-        const converter = generateConverter(A, B, [
-            {
-                source: "a_field",
-                target: "b_field",
-                default: "DEFAULT_FIELD",
-                expr: s => new C(),
-                converter: internalConverter,
-            },
+            { source: "a_field", target: "b_field", converter: internalConverter },
         ]);
 
         // Test

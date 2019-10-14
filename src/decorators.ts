@@ -1,5 +1,6 @@
 import { Constructor, Conversion, Converter } from "./converter";
 import { generateMappingFunction } from "./mapping";
+import { type } from "os";
 
 /**
  * Mapping rules that will be used during mapping.
@@ -7,28 +8,41 @@ import { generateMappingFunction } from "./mapping";
  * source - name of the source object field
  * source - name of the target object field
  * default - set default value if field is null
- * expr - helps to pre evaluate field value
  * isCollection - transform field value with Array.map
+ * expr - helps to  convert value instead implementing converter
  * converter - convert field value with converter
  *
  * Mapping has the next order:
  *  - Setup default in field if null
- *  - Evaluate expr
- *  - Evaluate converter
+ *  - Evaluate expr or Evaluate converter
  *
  *  If isCollection is true then for each value in collection will be performed:
- *  - Evaluate expr
- *  - Evaluate converter
+ *  - Evaluate expr or Evaluate converter
  */
-export interface MappingRules {
-    source: string;
-    target: string;
-    default?: any;
-    expr?: (x: any) => any;
+type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+
+export type ContainsExpression<SourceFieldType, TargetFieldType> = {
+    expr: (x: SourceFieldType) => TargetFieldType;
+};
+
+export type ContainsConverter<SourceFieldType, TargetFieldType> = {
+    converter: Constructor<Converter<SourceFieldType, TargetFieldType>>;
+};
+
+export type Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> = {
+    source: SourceField;
+    target: TargetField;
+    default?: TargetFieldType;
     isCollection?: boolean;
-    converter?: Constructor<Converter<any, any>>;
-    // converter?: Converter<any, any>
-}
+};
+
+export type MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType> = XOR<
+    Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> &
+        Partial<ContainsConverter<SourceFieldType, TargetFieldType>>,
+    Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> &
+        Partial<ContainsExpression<SourceFieldType, TargetFieldType>>
+>;
 
 /**
  * Declaration that describes mapper with:
@@ -50,46 +64,23 @@ export interface MapperDeclaration<IN, OUT> {
  * @param mappings - mappings
  * @constructor - generated mapper
  */
-export function Mapper<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>, mappings?: MappingRules[]) {
+export function Mapper<
+    IN,
+    OUT,
+    SourceField extends keyof IN,
+    TargetField extends keyof OUT,
+    SourceFieldType extends IN[SourceField],
+    TargetFieldType extends OUT[TargetField]
+>(
+    mapperDeclaration: MapperDeclaration<IN, OUT>,
+    mappings?: MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType>[]
+) {
     return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
         return class extends constructor {
             public mappings = mappings;
             public mappingFunction = generateMappingFunction(
                 mapperDeclaration.sourceType,
                 mapperDeclaration.targetType,
-                mappings
-            );
-        };
-    };
-}
-
-/**
- * Mapper API with separate mapper declaration and mappings decorators
- * @param mapperDeclaration - declaration
- * @constructor
- */
-export function Mapper2<IN, OUT>(mapperDeclaration: MapperDeclaration<IN, OUT>) {
-    return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
-        return class extends constructor {
-            public sourceType = mapperDeclaration.sourceType;
-            public targetType = mapperDeclaration.targetType;
-        };
-    };
-}
-
-/**
- * Mapper API with separate mapper declaration and mappings decorators
- * @param mappings - mappings
- * @constructor
- */
-export function Mapping<IN, OUT>(mappings?: MappingRules[]) {
-    return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
-        const currentConstructor = constructor;
-        return class extends constructor {
-            public mappings = mappings;
-            public mappingFunction = generateMappingFunction(
-                currentConstructor["sourceType"],
-                currentConstructor["targetType"],
                 mappings
             );
         };

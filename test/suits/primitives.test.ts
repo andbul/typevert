@@ -1,5 +1,5 @@
 /* tslint:disable */
-import { Mapper, Converter, MappingRules } from "../../src/typevert";
+import { Mapper, Converter, MappingRule } from "../../src/typevert";
 import { expect } from "chai";
 import { generateConverter } from "./testutils";
 

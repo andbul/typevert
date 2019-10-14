@@ -23,7 +23,7 @@
             "prettier --write",
             "git add"
         ],
-        "*.ts": "tslint"
+        "*.ts": "tslint --project tsconfig.json {src}/**/*.ts"
     },
     "types": "./lib/typevert.d.ts",
     "repository": {
