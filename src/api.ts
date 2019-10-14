@@ -1,6 +1,6 @@
-import { Constructor, Conversion, Converter } from "./converter";
-import { generateMappingFunction } from "./mapping";
-import { type } from "os";
+import { Conversion, Converter } from "./converter";
+import { generateMappingFunction } from "./engine";
+import { Constructor } from "./utils";
 
 /**
  * Mapping rules that will be used during mapping.
@@ -14,13 +14,18 @@ import { type } from "os";
  *
  * Mapping has the next order:
  *  - Setup default in field if null
- *  - Evaluate expr or Evaluate converter
+ *  - Executes expr then Executes converter
  *
  *  If isCollection is true then for each value in collection will be performed:
- *  - Evaluate expr or Evaluate converter
+ *  - Executes expr then Executes converter
  */
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+
+export type Base<SourceField, TargetField, SourceFieldType, TargetFieldType> = {
+    source: SourceField;
+    target: TargetField;
+    default?: TargetFieldType;
+    isCollection?: boolean;
+};
 
 export type ContainsExpression<SourceFieldType, TargetFieldType> = {
     expr: (x: SourceFieldType) => TargetFieldType;
@@ -30,19 +35,36 @@ export type ContainsConverter<SourceFieldType, TargetFieldType> = {
     converter: Constructor<Converter<SourceFieldType, TargetFieldType>>;
 };
 
-export type Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> = {
-    source: SourceField;
-    target: TargetField;
-    default?: TargetFieldType;
-    isCollection?: boolean;
-};
+export type BaseWithExpression<SourceField, TargetField, SourceFieldType, TargetFieldType> = Base<
+    SourceField,
+    TargetField,
+    SourceFieldType,
+    TargetFieldType
+> &
+    ContainsExpression<SourceFieldType, TargetFieldType>;
 
-export type MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType> = XOR<
-    Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> &
-        Partial<ContainsConverter<SourceFieldType, TargetFieldType>>,
-    Rule<SourceField, TargetField, SourceFieldType, TargetFieldType> &
-        Partial<ContainsExpression<SourceFieldType, TargetFieldType>>
->;
+export type BaseWithConverter<SourceField, TargetField, SourceFieldType, TargetFieldType> = Base<
+    SourceField,
+    TargetField,
+    SourceFieldType,
+    TargetFieldType
+> &
+    ContainsConverter<SourceFieldType, TargetFieldType>;
+
+export type BaseWithBoth<SourceField, TargetField, SourceFieldType, MidleFieldType, TargetFieldType> = Base<
+    SourceField,
+    TargetField,
+    SourceFieldType,
+    TargetFieldType
+> &
+    ContainsExpression<SourceFieldType, MidleFieldType> &
+    ContainsConverter<MidleFieldType, TargetFieldType>;
+
+export type MappingRule<SourceField, TargetField, SourceFieldType, Midle, TargetFieldType> =
+    | Base<SourceField, TargetField, SourceFieldType, TargetFieldType>
+    | BaseWithExpression<SourceField, TargetField, SourceFieldType, TargetFieldType>
+    | BaseWithConverter<SourceField, TargetField, SourceFieldType, TargetFieldType>
+    | BaseWithBoth<SourceField, TargetField, SourceFieldType, Midle, TargetFieldType>;
 
 /**
  * Declaration that describes mapper with:
@@ -70,10 +92,11 @@ export function Mapper<
     SourceField extends keyof IN,
     TargetField extends keyof OUT,
     SourceFieldType extends IN[SourceField],
+    Midle,
     TargetFieldType extends OUT[TargetField]
 >(
     mapperDeclaration: MapperDeclaration<IN, OUT>,
-    mappings?: MappingRule<SourceField, TargetField, SourceFieldType, TargetFieldType>[]
+    mappings?: MappingRule<SourceField, TargetField, SourceFieldType, Midle, TargetFieldType>[]
 ) {
     return <T extends Constructor<Conversion<IN, OUT>>>(constructor: T) => {
         return class extends constructor {

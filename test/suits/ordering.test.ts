@@ -1,7 +1,6 @@
 /* tslint:disable */
-import { Mapper, Converter, MappingRule } from "../../src/typevert";
+import { Mapper, Converter } from "../../src";
 import { expect } from "chai";
-import { generateConverter, generateConverterConstructor } from "./testutils";
 
 export function suit() {
     it("should map field by default value", () => {
@@ -14,7 +13,7 @@ export function suit() {
         }
 
         const a = new A();
-        const converter = generateConverter(A, B, [
+        @Mapper({ sourceType: A, targetType: B }, [
             {
                 source: "a_field",
                 target: "b_field",
@@ -23,7 +22,9 @@ export function suit() {
                     throw new Error("Failed");
                 },
             },
-        ]);
+        ])
+        class GeneratedConverter extends Converter<A, B> {}
+        const converter = new GeneratedConverter();
 
         // Test
         const result = converter.convert(new A());
@@ -44,9 +45,12 @@ export function suit() {
         }
 
         const a = new A();
-        const converter = generateConverter(A, B, [
+
+        @Mapper({ sourceType: A, targetType: B }, [
             { source: "a_field", target: "b_field", default: "FAILED", expr: (x: string) => x.toUpperCase() },
-        ]);
+        ])
+        class GeneratedConverter extends Converter<A, B> {}
+        const converter = new GeneratedConverter();
 
         // Test
         const result = converter.convert(new A());
@@ -63,7 +67,7 @@ export function suit() {
             c_field: string = "expected";
         }
         class ConvertedC {
-            c_internal_field: number;
+            c_internal_field: string;
         }
         class A {
             a_field: C = new C();
@@ -73,12 +77,14 @@ export function suit() {
         }
 
         const a = new A();
-        const internalConverter = generateConverterConstructor(C, ConvertedC, [
-            { source: "c_field", target: "c_internal_field", default: 1 },
-        ]);
-        const converter = generateConverter(A, B, [
-            { source: "a_field", target: "b_field", converter: internalConverter },
-        ]);
+        @Mapper({ sourceType: C, targetType: ConvertedC }, [{ source: "c_field", target: "c_internal_field" }])
+        class InternalGeneratedConverter extends Converter<C, ConvertedC> {}
+
+        @Mapper({ sourceType: A, targetType: B }, [
+            { source: "a_field", target: "b_field", converter: InternalGeneratedConverter },
+        ])
+        class GeneratedConverter extends Converter<A, B> {}
+        const converter = new GeneratedConverter();
 
         // Test
         const result = converter.convert(new A());
@@ -87,6 +93,55 @@ export function suit() {
         expect(result)
             .to.have.property("b_field")
             .that.is.instanceof(ConvertedC);
+
+        expect(result)
+            .to.have.property("b_field")
+            .that.has.property("c_internal_field")
+            .that.is.a("string");
+
+        expect(result.b_field)
+            .to.have.property("c_internal_field")
+            .that.equals("expected");
+    });
+
+    it("should map field by expression and then by converter", () => {
+        // Setup
+        class C {
+            c_field: string = "expected";
+        }
+        class ConvertedC {
+            c_internal_field: number;
+        }
+        class A {
+            a_field: C = null;
+        }
+        class B {
+            b_field: ConvertedC;
+        }
+
+        const a = new A();
+        @Mapper({ sourceType: C, targetType: ConvertedC }, [{ source: "c_field", target: "c_internal_field" }])
+        class InternalGeneratedConverter extends Converter<C, ConvertedC> {}
+
+        @Mapper({ sourceType: A, targetType: B }, [
+            { source: "a_field", target: "b_field", expr: s => new C(), converter: InternalGeneratedConverter },
+        ])
+        class GeneratedConverter extends Converter<A, B> {}
+        const converter = new GeneratedConverter();
+
+        // Test
+        const result = converter.convert(new A());
+
+        // Assert
+        expect(result)
+            .to.have.property("b_field")
+            .that.is.instanceof(ConvertedC);
+
+        expect(result)
+            .to.have.property("b_field")
+            .that.has.property("c_internal_field")
+            .that.is.a("string");
+
         expect(result.b_field)
             .to.have.property("c_internal_field")
             .that.equals("expected");

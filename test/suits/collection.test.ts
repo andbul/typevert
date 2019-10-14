@@ -1,7 +1,6 @@
 /* tslint:disable */
 import { expect } from "chai";
-import { Converter, Mapper, MappingRule } from "../../src/typevert";
-import { generateConverter } from "./testutils";
+import { Converter, Mapper } from "../../src/";
 
 export function suit() {
     it("should map primitives in collections", () => {
@@ -17,11 +16,14 @@ export function suit() {
             b_obj_collection: object[];
         }
         const a = new A();
-        const converter = generateConverter(A, B, [
+
+        @Mapper({ sourceType: A, targetType: B }, [
             { source: "a_number_collection", target: "b_number_collection", isCollection: true },
             { source: "a_string_collection", target: "b_string_collection", isCollection: true },
             { source: "a_obj_collection", target: "b_obj_collection", isCollection: true },
-        ]);
+        ])
+        class GeneratedConverter extends Converter<A, B> {}
+        const converter = new GeneratedConverter();
 
         // Test
         const result = converter.convert(new A());
