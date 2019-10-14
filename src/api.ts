@@ -28,12 +28,26 @@ export type Base<SourceField, TargetField, SourceFieldType, TargetFieldType> = {
 };
 
 export type ContainsExpression<SourceFieldType, TargetFieldType> = {
-    expr: (x: SourceFieldType) => TargetFieldType;
+    expr: (x: any) => any;
 };
 
 export type ContainsConverter<SourceFieldType, TargetFieldType> = {
-    converter: Constructor<Converter<SourceFieldType, TargetFieldType>>;
+    converter: Constructor<Converter<any, any>>;
 };
+
+// export type ExpressionType<SourceFieldType, TargetFieldType> =
+//     SourceFieldType extends (infer Sv)[] ?
+//     TargetFieldType extends (infer Tv)[] ?
+//     ((x: SourceFieldType) => TargetFieldType) | ((x: Sv) => Tv)
+//     : ((x: SourceFieldType) => TargetFieldType)
+//     : ((x: SourceFieldType) => TargetFieldType)
+
+// export type ConverterType<SourceFieldType, TargetFieldType> =
+//     SourceFieldType extends (infer Sv)[] ?
+//     TargetFieldType extends (infer Tv)[] ?
+//     Converter<SourceFieldType, TargetFieldType> | Converter<Sv, Tv>
+//     : Converter<SourceFieldType, TargetFieldType>
+//     : Converter<SourceFieldType, TargetFieldType>
 
 export type BaseWithExpression<SourceField, TargetField, SourceFieldType, TargetFieldType> = Base<
     SourceField,
